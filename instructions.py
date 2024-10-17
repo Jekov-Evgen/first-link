@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter import ttk
 
 class Inst:
     def __init__(self) -> None:

@@ -1,5 +1,7 @@
 import openpyxl
 from graph import Graph
+import numpy as np
+from scipy.optimize import curve_fit
 
 class Logics:
     def __init__(self, path: str) -> None:
@@ -22,19 +24,17 @@ class Logics:
     def draw_graph(self):
         Graph(self.time, self.value)
         
+    def exp_function(self, t, K, T):
+        return K * (1 - np.exp(-t / T))
+    
     def calculations(self):
-        last_value = self.value[-1]
-        call = last_value * 0.63
+        time_array = np.array(self.time)
+        value_array = np.array(self.value)
         
-        closest_index = 0
-        closest_value = self.value[0]
-        min_diff = abs(self.value[0] - call)
+        initial_guess = [self.value[-1], 1] 
         
-        for i in range(1, len(self.value)):
-            diff = abs(self.value[i] - call)
-            if diff < min_diff:
-                min_diff = diff
-                closest_value = self.value[i]
-                closest_index = i
+        popt, pcov = curve_fit(self.exp_function, time_array, value_array, p0=initial_guess)
         
-        return [last_value, call, closest_index]
+        K_opt, T_opt = popt
+        
+        return [K_opt, T_opt]
